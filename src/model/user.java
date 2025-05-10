@@ -1,4 +1,8 @@
 package model;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 public class User {
     //constructor
     private String userId;
@@ -11,6 +15,9 @@ public class User {
         if (!userId.matches("^u_\\d{10}$")){
             throw new IllegalArgumentException("Invalid userId format. Expected: u_ followed by 10 digits.");
         }
+        if (!userRole.equals("customer") && !userRole.equals("admin")) {
+            throw new IllegalArgumentException("userRole must be either 'customer' or 'admin'");
+        }
         this.userId = userId;
         this.userName = userName;
         this.userPassword = userPassword;
@@ -19,29 +26,27 @@ public class User {
     }
 
     public User(){
+        //default value
+        this.userId = "u_0000000000";
+        this.userName = "defaultUser";
+        this.userPassword = "defaultPass";
         this.userRole = "customer";
+        // Set current time
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy_HH:mm:ss");
+        this.userRegisterTime = now.format(formatter);
     }
 
     // getter and setter (if needed)
-    public String getUserId() {
-        return userId;
-    }
 
-    public String getUserName() {
-        return userName;
-    }
-
-    public String getUserPassword() {
-        return userPassword;
-    }
-
-    public String getUserRegisterTime() {
-        return userRegisterTime;
-    }
-
-    public String getUserRole() {
-        return userRole;
-    }
+        /*  
+        public String getUserId() { return userId; }
+        public String getUserName() { return userName; }
+        public String getUserPassword() { return userPassword; }
+        public String getUserRegisterTime() { return userRegisterTime; }
+        public String getUserRole() { return userRole; }
+        */
+   
     // toString method
     @Override
     public String toString(){
