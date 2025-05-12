@@ -5,20 +5,19 @@ public class Customer extends User{
     private String userEmail;
     private String userMobile;
 
-    public Customer(String userId, String userName, 
-    String userPassword, String userRegisterTime, 
-    String userRole, String userEmail, String userMobile) {
+    public Customer(String userId, String userName, String userPassword, 
+    String userRegisterTime, String userRole, String userEmail, String userMobile) {
 
         super(userId, userName, userPassword, userRegisterTime, userRole);
         this.userEmail = userEmail;
         this.userMobile = userMobile;
-
     }
 
     public Customer(){
-        super(); //this is default value of superclass
+        super() ; //this is default value of superclass
         this.userEmail = "null@gmail.com";
         this.userMobile = "0000000000";
+        
     }
 
     

@@ -2,9 +2,12 @@ package model;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
+import java.util.Set;
 
 public class User {
-    //constructor
+    //constructor 
+    private static final Set<String> usedUserIds = new HashSet<>(); // Static set to track used userIds
     private String userId;
     private String userName;
     private String userPassword;
@@ -18,16 +21,24 @@ public class User {
         if (!userRole.equals("customer") && !userRole.equals("admin")) {
             throw new IllegalArgumentException("userRole must be either 'customer' or 'admin'");
         }
+        if (usedUserIds.contains(userId)) {
+            throw new IllegalArgumentException("UserId already exists");
+        }
         this.userId = userId;
         this.userName = userName;
         this.userPassword = userPassword;
         this.userRegisterTime = userRegisterTime;
         this.userRole = userRole;
+                
+        usedUserIds.add(userId); // mark this ID as used
     }
-
-    public User(){
+    
         //default value
+    public User(){
         this.userId = "u_0000000000";
+        if (usedUserIds.contains(userId)) {
+            throw new IllegalArgumentException("Default userId already used. Use parameterized constructor with unique ID.");
+        }
         this.userName = "defaultUser";
         this.userPassword = "defaultPass";
         this.userRole = "customer";
@@ -35,18 +46,24 @@ public class User {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy_HH:mm:ss");
         this.userRegisterTime = now.format(formatter);
+
+        usedUserIds.add(userId);
     }
 
     // getter and setter (if needed)
 
-        /*  
+        
         public String getUserId() { return userId; }
         public String getUserName() { return userName; }
         public String getUserPassword() { return userPassword; }
         public String getUserRegisterTime() { return userRegisterTime; }
         public String getUserRole() { return userRole; }
-        */
-   
+        
+        public void setUserId(String userId) { this.userId = userId; }
+        public void setUserName(String userName) { this.userName = userName; }
+        public void setUserPassword(String userPassword) { this.userPassword = userPassword; }
+        public void setUserRegisterTime(String userRegisterTime) { this.userRegisterTime = userRegisterTime; }
+        public void setUserRole(String userRole) { this.userRole = userRole; }
     // toString method
     @Override
     public String toString(){
