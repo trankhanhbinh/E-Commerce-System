@@ -37,7 +37,7 @@ public class User {
     public User(){
         this.userId = "u_0000000000";
         if (usedUserIds.contains(userId)) {
-            throw new IllegalArgumentException("Default userId already used. Use parameterized constructor with unique ID.");
+            throw new IllegalArgumentException("Default userId already used.");
         }
         this.userName = "defaultUser";
         this.userPassword = "defaultPass";
