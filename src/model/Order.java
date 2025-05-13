@@ -1,5 +1,7 @@
 package model;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,9 +28,26 @@ public class Order {
         usedOrderIds.add(userId);
     }
 
-        //default value
+    //default value
     public Order(){
-        this.orderId = "u_00000";
+        this.orderId = "o_00000";
         this.userId = "u_0000000000";
+        if(usedOrderIds.contains(orderId)) {
+            throw new IllegalArgumentException("Default orderId already used.");
+        }
+        this.proId = "defaultProID";
+        //set current time
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy_HH:mm:ss");
+        this.orderTime = now.format(formatter);
+        usedOrderIds.add(orderId);
+    }
+
+    // toString method
+    @Override
+    public String toString() {
+        return String.format(
+            "{\"order_id\":\"%s\", \"user_id\":\"%s\", \"pro_id\":\"%s\", \"order_time\":\"%s\"}",
+            orderId, userId, proId, orderTime);
     }
 }
