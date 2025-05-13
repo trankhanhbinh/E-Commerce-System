@@ -10,7 +10,7 @@ public class Main {
 
         users.add(new User("u_1234567890", "Alice", "pass123", "10-05-2025_12:30:00", "customer"));
         users.add(new User("u_0987654321", "Bob", "secret", "09-05-2025_15:00:00", "customer"));
-        users.add(new Admin());
+        users.add(new Admin());        
         UserFileWriter.writeUsersToFile(users);
 
     }
