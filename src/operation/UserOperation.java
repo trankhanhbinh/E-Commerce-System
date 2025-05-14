@@ -1,13 +1,13 @@
-package Assignment.src.operation;
+package operation;
 import java.io.*;
 import java.util.Random;
 import java.util.regex.Pattern;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import Assignment.src.model.Admin;
-import Assignment.src.model.Customer;
-import Assignment.src.model.User;
+import model.Admin;
+import model.Customer;
+import model.User;
 
 public class UserOperation{
     private static UserOperation instance;
