@@ -1,4 +1,4 @@
-package Assignment.src.operation;
+package operation;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -59,13 +59,13 @@ public class AdminOperation{
         JSONParser parser = new JSONParser();
         try (BufferedReader reader = new BufferedReader(new FileReader(USER_FILE))){
             String line;
-            while ((line = reader.readLine()) != null) {
+            while ((line = reader.readLine()) != null){
                 if (line.trim().isEmpty())
                     continue;
                 try {
                     JSONObject obj = (JSONObject) parser.parse(line);
                     list.add(obj);
-                } catch (ParseException pe){
+                }catch (ParseException pe){
                     System.err.println("Error parsing user JSON: " + pe.getMessage());
                 }
             }
