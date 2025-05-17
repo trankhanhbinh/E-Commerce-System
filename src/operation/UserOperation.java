@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-package operation;
-
-public class UserOperation {
-    public static UserOperation getInstance() {
-        
-    }
-}
-=======
 package operation;
 import java.io.*;
 import java.util.Random;
@@ -139,4 +130,3 @@ public class UserOperation{
         return null;
     }
 }
->>>>>>> 29080e54f8b005ed54c4620bb857c378a004694e
