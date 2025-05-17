@@ -1,4 +1,4 @@
-package operation;
+package Assignment.src.operation;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -9,19 +9,37 @@ import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import javafx.application.Platform;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
+import javafx.scene.image.WritableImage;
+import javax.imageio.ImageIO;
 
-import model.Order;
+
+import Assignment.src.model.Order;
 
 public class OrderOperation{
     private static OrderOperation instance;
     private static final String ORDER_FILE = "data/orders.txt";
     private static final int PAGE_SIZE = 10;
     
+    static {
+        Platform.startup(() -> {});
+    }
+
     private OrderOperation(){
     }
     
@@ -103,21 +121,139 @@ public class OrderOperation{
         return new OrderListResult(pageList, pageNumber, totalPages);
     }
     
-    public void generateTestOrderData(){
-        System.out.println("Generating test order data...");
+        public void generateSingleCustomerConsumptionFigure(final String customerId) {
+        Platform.runLater(() -> {
+            List<Order> orders = readOrdersFromFile();
+            Map<String, Double> monthlyConsumption = new HashMap<>();
+            for (Order order : orders) {
+                if (order.getUserId().equals(customerId)) {
+                    try {
+                        LocalDateTime orderDate = LocalDateTime.parse(order.getOrderTime(), DATETIME_FORMATTER);
+                        String monthYear = String.format("%02d-%d", orderDate.getMonthValue(), orderDate.getYear());
+                        double price = 0.0;
+                        if (ProductOperation.getInstance().getProductById(order.getProId()) != null) {
+                            price = ProductOperation.getInstance().getProductById(order.getProId()).getProCurrentPrice();
+                        }
+                        monthlyConsumption.put(monthYear, monthlyConsumption.getOrDefault(monthYear, 0.0) + price);
+                    } catch (Exception e) {
+                    }
+                }
+            }
+
+            CategoryAxis xAxis = new CategoryAxis();
+            xAxis.setLabel("Month-Year");
+            NumberAxis yAxis = new NumberAxis();
+            yAxis.setLabel("Total Consumption ($)");
+            BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
+            barChart.setTitle("Monthly Consumption for Customer " + customerId);
+            XYChart.Series<String, Number> series = new XYChart.Series<>();
+            series.setName("Spending");
+            for (Map.Entry<String, Double> entry : monthlyConsumption.entrySet()) {
+                series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
+            }
+            barChart.getData().add(series);
+
+            Scene scene = new Scene(barChart, 800, 600);
+            WritableImage image = scene.snapshot(null);
+
+            File outputDir = new File("data/figure");
+            if (!outputDir.exists()) {
+                outputDir.mkdirs();
+            }
+            File file = new File(outputDir, "customer_" + customerId + "_consumption.png");
+            try {
+                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
-    
-    public void generateSingleCustomerConsumptionFigure(String customerId){
-        System.out.println("Generating consumption figure for customer " + customerId + "...");
+
+    public void generateAllCustomersConsumptionFigure() {
+        Platform.runLater(() -> {
+            List<Order> orders = readOrdersFromFile();
+            Map<String, Double> consumptionByCustomer = new HashMap<>();
+            for (Order order : orders) {
+                String custId = order.getUserId();
+                double price = 0.0;
+                if (ProductOperation.getInstance().getProductById(order.getProId()) != null) {
+                    price = ProductOperation.getInstance().getProductById(order.getProId()).getProCurrentPrice();
+                }
+                consumptionByCustomer.put(custId, consumptionByCustomer.getOrDefault(custId, 0.0) + price);
+            }
+
+            CategoryAxis xAxis = new CategoryAxis();
+            xAxis.setLabel("Customer ID");
+            NumberAxis yAxis = new NumberAxis();
+            yAxis.setLabel("Total Consumption ($)");
+            BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
+            barChart.setTitle("Total Consumption by Customer");
+            XYChart.Series<String, Number> series = new XYChart.Series<>();
+            series.setName("Consumption");
+            for (Map.Entry<String, Double> entry : consumptionByCustomer.entrySet()) {
+                series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
+            }
+            barChart.getData().add(series);
+
+            Scene scene = new Scene(barChart, 800, 600);
+            WritableImage image = scene.snapshot(null);
+
+            File outputDir = new File("data/figure");
+            if (!outputDir.exists()) {
+                outputDir.mkdirs();
+            }
+            File file = new File(outputDir, "all_customers_consumption.png");
+            try {
+                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
-    
-    public void generateAllCustomersConsumptionFigure(){
-        System.out.println("Generating consumption figure for all customers...");
+
+    public void generateAllTop10BestSellersFigure() {
+        Platform.runLater(() -> {
+            List<Order> orders = readOrdersFromFile();
+            Map<String, Integer> salesCount = new HashMap<>();
+            for (Order order : orders) {
+                String productId = order.getProId();
+                salesCount.put(productId, salesCount.getOrDefault(productId, 0) + 1);
+            }
+            List<Map.Entry<String, Integer>> sortedSales = new ArrayList<>(salesCount.entrySet());
+            sortedSales.sort((a, b) -> b.getValue().compareTo(a.getValue()));
+            if (sortedSales.size() > 10) {
+                sortedSales = sortedSales.subList(0, 10);
+            }
+
+            CategoryAxis xAxis = new CategoryAxis();
+            xAxis.setLabel("Product ID");
+            NumberAxis yAxis = new NumberAxis();
+            yAxis.setLabel("Orders Count");
+            BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
+            barChart.setTitle("Top 10 Best Selling Products");
+            XYChart.Series<String, Number> series = new XYChart.Series<>();
+            series.setName("Sales");
+            for (Map.Entry<String, Integer> entry : sortedSales) {
+                series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
+            }
+            barChart.getData().add(series);
+
+            Scene scene = new Scene(barChart, 800, 600);
+            WritableImage image = scene.snapshot(null);
+
+            File outputDir = new File("data/figure");
+            if (!outputDir.exists()) {
+                outputDir.mkdirs();
+            }
+            File file = new File(outputDir, "top10_bestsellers.png");
+            try {
+                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
-    
-    public void generateAllTop10BestSellersFigure(){
-        System.out.println("Generating top 10 best sellers figure...");
-    }
+
     
     public void deleteAllOrders(){
         try (PrintWriter writer = new PrintWriter(new FileWriter(ORDER_FILE, false))){

@@ -1,12 +1,26 @@
-package operation;
+package Assignment.src.operation;
 
 import java.io.*;
 import java.util.*;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import javafx.application.Platform;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.PieChart;
+import javafx.scene.chart.ScatterChart;
+import javafx.scene.chart.XYChart;
+import javafx.scene.image.WritableImage;
+import javafx.stage.Stage;
+import javax.imageio.ImageIO;
 
-import model.Product;
+
+import Assignment.src.model.Product;
 
 public class ProductOperation{
     private static ProductOperation instance;
@@ -14,6 +28,11 @@ public class ProductOperation{
     private static final int PAGE_SIZE = 10;
     private ProductOperation(){
     }
+
+    static{
+        Platform.startup(() -> {});
+    }
+
     
     public static ProductOperation getInstance(){
         if (instance == null){
@@ -83,26 +102,145 @@ public class ProductOperation{
         return null;
     }
     
-    public void generateCategoryFigure(){
-        System.out.println("Generating category bar chart and saving...");
+       
+    public void generateCategoryFigure() {
+        Platform.runLater(() -> {
+            List<Product> products = readProductsFromFile();
+            // Count products by category
+            java.util.Map<String, Integer> categoryCount = new java.util.HashMap<>();
+            for (Product p : products) {
+                String cat = p.getProCategory();
+                categoryCount.put(cat, categoryCount.getOrDefault(cat, 0) + 1);
+            }
+            CategoryAxis xAxis = new CategoryAxis();
+            xAxis.setLabel("Category");
+            NumberAxis yAxis = new NumberAxis();
+            yAxis.setLabel("Count");
+            BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
+            barChart.setTitle("Products by Category");
+            XYChart.Series<String, Number> series = new XYChart.Series<>();
+            for (java.util.Map.Entry<String, Integer> entry : categoryCount.entrySet()) {
+                series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
+            }
+            barChart.getData().add(series);
+            Scene scene = new Scene(barChart, 800, 600);
+            WritableImage image = scene.snapshot(null);
+            File outputDir = new File("data/figure");
+            if (!outputDir.exists()) {
+                outputDir.mkdirs();
+            }
+            File file = new File(outputDir, "category_chart.png");
+            try {
+                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
     
     public void generateDiscountFigure(){
-        System.out.println("Generating discount pie chart and saving...");
+        Platform.runLater(() -> {
+            List<Product> products = readProductsFromFile();
+            int lessThan30 = 0, between30And60 = 0, greaterThan60 = 0;
+            for (Product p : products) {
+                double discount = p.getProDiscount();
+                if (discount < 30) {
+                    lessThan30++;
+                } else if (discount <= 60) {
+                    between30And60++;
+                } else {
+                    greaterThan60++;
+                }
+            }
+            PieChart pieChart = new PieChart();
+            pieChart.setTitle("Discount Distribution");
+            pieChart.getData().add(new PieChart.Data("Less than 30", lessThan30));
+            pieChart.getData().add(new PieChart.Data("30 to 60", between30And60));
+            pieChart.getData().add(new PieChart.Data("Greater than 60", greaterThan60));
+            Scene scene = new Scene(pieChart, 800, 600);
+            WritableImage image = scene.snapshot(null);
+            File outputDir = new File("data/figure");
+            if (!outputDir.exists()) {
+                outputDir.mkdirs();
+            }
+            File file = new File(outputDir, "discount_chart.png");
+            try {
+                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+        });
     }
     
     public void generateLikesCountFigure(){
-        System.out.println("Generating likes count chart and saving...");
+        Platform.runLater(() -> {
+            List<Product> products = readProductsFromFile();
+            java.util.Map<String, Integer> likesByCategory = new java.util.HashMap<>();
+            for (Product p : products) {
+                String cat = p.getProCategory();
+                likesByCategory.put(cat, likesByCategory.getOrDefault(cat, 0) + p.getProLikesCount());
+            }
+            List<Map.Entry<String, Integer>> entryList = new ArrayList<>(likesByCategory.entrySet());
+            entryList.sort(java.util.Map.Entry.comparingByValue());
+            CategoryAxis xAxis = new CategoryAxis();
+            xAxis.setLabel("Category");
+            NumberAxis yAxis = new NumberAxis();
+            yAxis.setLabel("Total Likes");
+            BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
+            barChart.setTitle("Total Likes by Category (Ascending)");
+            XYChart.Series<String, Number> series = new XYChart.Series<>();
+            for (Map.Entry<String, Integer> entry : entryList) {
+                series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
+            }
+            barChart.getData().add(series);
+            Scene scene = new Scene(barChart, 800, 600);
+            WritableImage image = scene.snapshot(null);
+            File outputDir = new File("data/figure");
+            if (!outputDir.exists()) {
+                outputDir.mkdirs();
+            }
+            File file = new File(outputDir, "likes_count_chart.png");
+            try {
+                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
     
     public void generateDiscountLikesCountFigure(){
-        System.out.println("Generating scatter chart of discount vs. likes count and saving...");
+        Platform.runLater(() -> {
+            List<Product> products = readProductsFromFile();
+            CategoryAxis xAxis = new CategoryAxis();
+            xAxis.setLabel("Discount (%)");
+            NumberAxis yAxis = new NumberAxis();
+            yAxis.setLabel("Likes Count");
+            ScatterChart<String, Number> scatterChart = new ScatterChart<>(xAxis, yAxis);
+            scatterChart.setTitle("Likes Count vs Discount");
+            XYChart.Series<String, Number> series = new XYChart.Series<>();
+            for (Product p : products) {
+                series.getData().add(new XYChart.Data<>(Double.toString(p.getProDiscount()), p.getProLikesCount()));
+            }
+            scatterChart.getData().add(series);
+            Scene scene = new Scene(scatterChart, 800, 600);
+            WritableImage image = scene.snapshot(null);
+            File outputDir = new File("data/figure");
+            if (!outputDir.exists()) {
+                outputDir.mkdirs();
+            }
+            File file = new File(outputDir, "discount_likes_scatter.png");
+            try {
+                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
     
-    public void deleteAllProducts(){
-        try (PrintWriter writer = new PrintWriter(new FileWriter(PRODUCT_FILE, false))){
+    public void deleteAllProducts() {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(PRODUCT_FILE, false))) {
             writer.print("");
-        }catch (IOException e){
+        } catch (IOException e) {
             System.err.println("Error deleting all products: " + e.getMessage());
         }
     }
@@ -128,8 +266,7 @@ public class ProductOperation{
                     double proRawPrice = Double.parseDouble(json.get("pro_raw_price").toString());
                     double proDiscount = Double.parseDouble(json.get("pro_discount").toString());
                     int proLikesCount = Integer.parseInt(json.get("pro_likes_count").toString());
-                    Product product = new Product(proId, proModel, proCategory, proName,
-                                                  proCurrentPrice, proRawPrice, proDiscount, proLikesCount);
+                    Product product = new Product(proId, proModel, proCategory, proName, proCurrentPrice, proRawPrice, proDiscount, proLikesCount);
                     products.add(product);
                 } catch (ParseException pe){
                     System.err.println("Error parsing product JSON: " + pe.getMessage());
@@ -166,11 +303,11 @@ public class ProductOperation{
             return productList;
         }
         
-        public int getCurrentPage() {
+        public int getCurrentPage(){
             return currentPage;
         }
         
-        public int getTotalPages() {
+        public int getTotalPages(){
             return totalPages;
         }
     }
