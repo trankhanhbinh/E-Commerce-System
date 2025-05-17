@@ -1,4 +1,4 @@
-package Assignment.src.operation;
+packageoperation;
 
 import java.io.*;
 import java.util.*;
@@ -6,7 +6,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import Assignment.src.model.Product;
+import model.Product;
 
 public class ProductOperation{
     private static ProductOperation instance;
