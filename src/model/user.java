@@ -51,8 +51,6 @@ public class User {
     }
 
     // getter and setter (if needed)
-
-        
         public String getUserId() { return userId; }
         public String getUserName() { return userName; }
         public String getUserPassword() { return userPassword; }

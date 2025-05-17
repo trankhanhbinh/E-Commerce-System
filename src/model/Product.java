@@ -36,6 +36,24 @@ public class Product {
         this.proLikesCount = 0;
     }
 
+    // getter and setter (if needed)
+    public String getProId() { return proId; }
+    public String getProModel() { return proModel; }
+    public String getProCategory() { return proCategory; }
+    public String getProName() { return proName; }
+    public double getProCurrentPrice() { return proCurrentPrice; }
+    public double getProRawPrice() { return proRawPrice; }
+    public double getProDiscount() { return proDiscount; }
+    public int getProLikesCount() { return proLikesCount; }
+
+    public void setProId(String proId) { this.proId = proId; }
+    public void setProModel(String proModel) { this.proModel = proModel; }
+    public void setProCategory(String proCategory) { this.proCategory = proCategory; }
+    public void setProName(String proName) { this.proName = proName; }
+    public void setProCurrentPrice(double proCurrentPrice) { this.proCurrentPrice = proCurrentPrice; }
+    public void setProRawPrice(double proRawPrice) { this.proRawPrice = proRawPrice; }
+    public void setProDiscount(double proDiscount) { this.proDiscount = proDiscount; }
+    public void setProLikesCount(int proLikesCount) { this.proLikesCount = proLikesCount; }
     // toString method
     @Override
     public String toString() {

@@ -43,6 +43,17 @@ public class Order {
         usedOrderIds.add(orderId);
     }
 
+        // getter and setter (if needed)
+    public String getOrderId() { return orderId; }
+    public String getUserId() { return userId; }
+    public String getProId() { return proId; }
+    public String getOrderTime() { return orderTime; }
+
+    public void setOrderId(String orderId) { this.orderId = orderId; }
+    public void setUserId(String userId) { this.userId = userId; }
+    public void setProId(String proId) { this.proId = proId; }
+    public void setOrderTime(String orderTime) { this.orderTime = orderTime; }
+    
     // toString method
     @Override
     public String toString() {

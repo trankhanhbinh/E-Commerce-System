@@ -17,10 +17,15 @@ public class Customer extends User{
         super() ; //this is default value of superclass
         this.userEmail = "null@gmail.com";
         this.userMobile = "0000000000";
-        
     }
 
-    
+    // getter and setter (if needed)
+    public String getUserEmail() { return userEmail; }
+    public String getUserMobile() { return userMobile; }
+
+    public void setUserEmail(String userEmail) { this.userEmail = userEmail; }
+    public void setUserMobile(String userMobile) { this.userMobile = userMobile; }
+
     // toString method
     @Override
     public String toString() {
