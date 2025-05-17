@@ -84,25 +84,25 @@ public class ProductOperation{
     }
     
     public void generateCategoryFigure(){
-        System.out.println("Generating category bar chart and saving to data/figure folder.");
+        System.out.println("Generating category bar chart and saving...");
     }
     
     public void generateDiscountFigure(){
-        System.out.println("Generating discount pie chart and saving to data/figure folder.");
+        System.out.println("Generating discount pie chart and saving...");
     }
     
     public void generateLikesCountFigure(){
-        System.out.println("Generating likes count chart and saving to data/figure folder.");
+        System.out.println("Generating likes count chart and saving...");
     }
     
     public void generateDiscountLikesCountFigure(){
-        System.out.println("Generating scatter chart of discount vs. likes count and saving to data/figure folder.");
+        System.out.println("Generating scatter chart of discount vs. likes count and saving...");
     }
     
     public void deleteAllProducts(){
-        try (PrintWriter writer = new PrintWriter(new FileWriter(PRODUCT_FILE, false))) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(PRODUCT_FILE, false))){
             writer.print("");
-        } catch (IOException e) {
+        }catch (IOException e){
             System.err.println("Error deleting all products: " + e.getMessage());
         }
     }
