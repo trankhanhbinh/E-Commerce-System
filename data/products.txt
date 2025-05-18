@@ -1,0 +1,20 @@
+{"pro_id":"p001","pro_model":"iPhoneX","pro_category":"Smartphone","pro_name":"iPhone X 64GB","pro_current_price":699.99,"pro_raw_price":999.99,"pro_discount":30.0,"pro_likes_count":245} 
+{"pro_id":"p002","pro_model":"GalaxyS21","pro_category":"Smartphone","pro_name":"Samsung Galaxy S21 128GB","pro_current_price":749.99,"pro_raw_price":899.99,"pro_discount":16.67,"pro_likes_count":198}
+{"pro_id":"p003","pro_model":"iPadPro11","pro_category":"Tablet","pro_name":"iPad Pro 11-inch 256GB","pro_current_price":899.99,"pro_raw_price":999.99,"pro_discount":10.0,"pro_likes_count":156} 
+{"pro_id":"p004","pro_model":"SurfacePro7","pro_category":"Tablet","pro_name":"Microsoft Surface Pro 7 128GB","pro_current_price":749.99,"pro_raw_price":899.99,"pro_discount":16.67,"pro_likes_count":122} 
+{"pro_id":"p005","pro_model":"MacBookAir","pro_category":"Laptop","pro_name":"MacBook Air M1 256GB","pro_current_price":949.99,"pro_raw_price":1099.99,"pro_discount":13.64,"pro_likes_count":287} 
+{"pro_id":"p006","pro_model":"XPS13","pro_category":"Laptop","pro_name":"Dell XPS 13 512GB","pro_current_price":1099.99,"pro_raw_price":1299.99,"pro_discount":15.38,"pro_likes_count":165} 
+{"pro_id":"p007","pro_model":"AirPodsMax","pro_category":"Headphones","pro_name":"Apple AirPods Max","pro_current_price":479.99,"pro_raw_price":549.99,"pro_discount":12.73,"pro_likes_count":98} 
+{"pro_id":"p008","pro_model":"QC45","pro_category":"Headphones","pro_name":"Bose QuietComfort 45","pro_current_price":299.99,"pro_raw_price":349.99,"pro_discount":14.29,"pro_likes_count":143} 
+{"pro_id":"p009","pro_model":"GalaxyWatch4","pro_category":"Smartwatch","pro_name":"Samsung Galaxy Watch 4 44mm","pro_current_price":229.99,"pro_raw_price":279.99,"pro_discount":17.86,"pro_likes_count":76} 
+{"pro_id":"p010","pro_model":"AppleWatch7","pro_category":"Smartwatch","pro_name":"Apple Watch Series 7 45mm","pro_current_price":399.99,"pro_raw_price":429.99,"pro_discount":6.98,"pro_likes_count":187} 
+{"pro_id":"p011","pro_model":"PS5","pro_category":"Console","pro_name":"PlayStation 5 Digital Edition","pro_current_price":399.99,"pro_raw_price":399.99,"pro_discount":0.0,"pro_likes_count":312} 
+{"pro_id":"p012","pro_model":"XboxSeriesX","pro_category":"Console","pro_name":"Xbox Series X 1TB","pro_current_price":499.99,"pro_raw_price":499.99,"pro_discount":0.0,"pro_likes_count":274} 
+{"pro_id":"p013","pro_model":"NintendoSwitch","pro_category":"Console","pro_name":"Nintendo Switch OLED Model","pro_current_price":349.99,"pro_raw_price":349.99,"pro_discount":0.0,"pro_likes_count":198} 
+{"pro_id":"p014","pro_model":"SonyA7IV","pro_category":"Camera","pro_name":"Sony Alpha a7 IV Mirrorless Camera","pro_current_price":2399.99,"pro_raw_price":2499.99,"pro_discount":4.0,"pro_likes_count":87} 
+{"pro_id":"p015","pro_model":"CanonR6","pro_category":"Camera","pro_name":"Canon EOS R6 Mirrorless Camera","pro_current_price":2299.99,"pro_raw_price":2499.99,"pro_discount":8.0,"pro_likes_count":92} 
+{"pro_id":"p016","pro_model":"DJIMini3","pro_category":"Drone","pro_name":"DJI Mini 3 Pro","pro_current_price":699.99,"pro_raw_price":759.99,"pro_discount":7.89,"pro_likes_count":64} 
+{"pro_id":"p017","pro_model":"SonyWF1000XM4","pro_category":"Earbuds","pro_name":"Sony WF-1000XM4 Earbuds","pro_current_price":249.99,"pro_raw_price":279.99,"pro_discount":10.71,"pro_likes_count":118} 
+{"pro_id":"p018","pro_model":"LGC1","pro_category":"TV","pro_name":"LG C1 65-inch OLED 4K TV","pro_current_price":1799.99,"pro_raw_price":2499.99,"pro_discount":28.0,"pro_likes_count":153} 
+{"pro_id":"p019","pro_model":"SamsungQN90A","pro_category":"TV","pro_name":"Samsung QN90A 55-inch Neo QLED 4K TV","pro_current_price":1299.99,"pro_raw_price":1799.99,"pro_discount":27.78,"pro_likes_count":127} 
+{"pro_id":"p020","pro_model":"SonySRS-XB33","pro_category":"Speaker","pro_name":"Sony SRS-XB33 Portable Bluetooth Speaker","pro_current_price":99.99,"pro_raw_price":149.99,"pro_discount":33.33,"pro_likes_count":56}
