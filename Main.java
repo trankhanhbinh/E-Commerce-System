@@ -1,3 +1,5 @@
+package Assignment.src;
+
 import java.io.File;
 import java.util.List;
 import java.util.Scanner;
@@ -113,11 +115,11 @@ public class Main {
                     CustomerOperation.CustomerListResult cr = CustomerOperation.getInstance().getCustomerList(cPage);
                     io.showList(adminUser.getUserRole(), "Customer", cr.getCustomerList(), cr.getCurrentPage(), cr.getTotalPages());
                     break;
-                case "4": // Show orders for admin
+                case "4": // Show orders
                     System.out.print("Enter page number for order list: ");
                     int oPage = Integer.parseInt(scanner.nextLine().trim());
-                    List<Order> orders = OrderOperation.getInstance().getOrderList("all", oPage).getOrderList();
-                    io.showList(adminUser.getUserRole(), "Order", orders, oPage, 0);
+                    OrderOperation.OrderListResult orderRes = OrderOperation.getInstance().getOrderList("all", oPage);
+                    io.showList(adminUser.getUserRole(), "Order", orderRes.getOrderList(), orderRes.getCurrentPage(), orderRes.getTotalPages());
                     break;
                 case "5": // Generate test data (for orders)
                     OrderOperation.getInstance().generateTestOrderData();
@@ -166,7 +168,7 @@ public class Main {
                     String attr = scanner.nextLine().trim();
                     System.out.print("Enter new value: ");
                     String newVal = scanner.nextLine().trim();
-                    boolean updated = CustomerOperation.getInstance().updateProfile(attr, newVal, (model.Customer) customerUser);
+                    boolean updated = CustomerOperation.getInstance().updateProfile(attr, newVal, (Assignment.src.model.Customer) customerUser);
                     if (updated) {
                         io.printMessage("Profile updated successfully.");
                     } else {
