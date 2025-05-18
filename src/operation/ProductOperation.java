@@ -49,7 +49,7 @@ public class ProductOperation{
     }
     
     public void extractProductsFromFiles(){
-        File sourceFile = new File("data/products_source.txt");
+        File sourceFile = new File("data/products.txt");
         File targetFile = new File(PRODUCT_FILE);
         if (!sourceFile.exists()){
             System.err.println("Source file not found: " + sourceFile.getAbsolutePath());
