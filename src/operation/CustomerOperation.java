@@ -1,4 +1,4 @@
-package Assignment.src.operation;
+package operation;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -16,7 +16,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import Assignment.src.model.Customer;
+import model.Customer;
 
 public class CustomerOperation{
     private static CustomerOperation instance;
