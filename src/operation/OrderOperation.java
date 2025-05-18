@@ -30,15 +30,12 @@ import javax.imageio.ImageIO;
 
 
 import Assignment.src.model.Order;
+import Assignment.src.model.Product;
 
 public class OrderOperation{
     private static OrderOperation instance;
     private static final String ORDER_FILE = "data/orders.txt";
     private static final int PAGE_SIZE = 10;
-    
-    static {
-        Platform.startup(() -> {});
-    }
 
     private OrderOperation(){
     }
@@ -101,6 +98,44 @@ public class OrderOperation{
         return found;
     }
     
+    public void generateTestOrderData() {
+    String[] customerIds = {
+        "u_0000000002", "u_0000000003", "u_0000000004",
+        "u_0000000005", "u_0000000006", "u_0000000007",
+        "u_0000000008", "u_0000000009", "u_0000000010",
+        "u_0000000011"
+    };
+    
+    var productResult = ProductOperation.getInstance().getProductList(1);
+    List<Product> availableProducts = productResult.getProductList();
+    if (availableProducts == null || availableProducts.isEmpty()) {
+        // add a dummy product.
+        availableProducts = new ArrayList<>();
+        availableProducts.add(new Product("p_dummy", "dummyModel", "dummyCategory", "Dummy Product", 0.0, 0.0, 0.0, 0));
+    }
+    
+    deleteAllOrders();
+    
+    java.util.Random rand = new java.util.Random();
+    
+    for (String customerId : customerIds) {
+        int numOrders = 50 + rand.nextInt(151);
+        for (int i = 0; i < numOrders; i++) {
+            Product p = availableProducts.get(rand.nextInt(availableProducts.size()));
+            String productId = p.getProId();
+            
+            int year = 2024;
+            int month = 1 + rand.nextInt(12);
+            int day = 1 + rand.nextInt(28);
+            int hour = rand.nextInt(24);
+            int minute = rand.nextInt(60);
+            int second = rand.nextInt(60);
+            String orderTime = String.format("%02d-%02d-%04d_%02d:%02d:%02d", day, month, year, hour, minute, second);
+            
+            createAnOrder(customerId, productId, orderTime);
+            }
+        }
+    }
     public OrderListResult getOrderList(String customerId, int pageNumber){
         List<Order> orders = readOrdersFromFile();
         List<Order> customerOrders = new ArrayList<>();
@@ -123,12 +158,13 @@ public class OrderOperation{
     
         public void generateSingleCustomerConsumptionFigure(final String customerId) {
         Platform.runLater(() -> {
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy_HH:mm:ss");
             List<Order> orders = readOrdersFromFile();
             Map<String, Double> monthlyConsumption = new HashMap<>();
             for (Order order : orders) {
                 if (order.getUserId().equals(customerId)) {
                     try {
-                        LocalDateTime orderDate = LocalDateTime.parse(order.getOrderTime(), DATETIME_FORMATTER);
+                        LocalDateTime orderDate = LocalDateTime.parse(order.getOrderTime(), dateTimeFormatter);
                         String monthYear = String.format("%02d-%d", orderDate.getMonthValue(), orderDate.getYear());
                         double price = 0.0;
                         if (ProductOperation.getInstance().getProductById(order.getProId()) != null) {

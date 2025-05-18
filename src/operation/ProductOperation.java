@@ -1,4 +1,4 @@
-package operation
+package Assignment.src.operation;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -27,16 +27,12 @@ import javafx.scene.image.WritableImage;
 import javafx.stage.Stage;
 import javax.imageio.ImageIO;
 
-import model.Product;
+import Assignment.src.model.Product;
 
 public class ProductOperation{
     private static ProductOperation instance;
     private static final String PRODUCT_FILE = "data/products.txt";
     private static final int PAGE_SIZE = 10;
-    
-    static{
-        Platform.startup(() -> {});
-    }
     
     private ProductOperation(){
     }
