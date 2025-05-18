@@ -1,4 +1,4 @@
-package operation
+package operation;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -6,322 +6,277 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import javafx.application.Platform;
-import javafx.embed.swing.SwingFXUtils;
-import javafx.scene.Scene;
-import javafx.scene.SnapshotParameters;
-import javafx.scene.chart.BarChart;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.PieChart;
-import javafx.scene.chart.ScatterChart;
-import javafx.scene.chart.XYChart;
-import javafx.scene.image.WritableImage;
-import javafx.stage.Stage;
-import javax.imageio.ImageIO;
 
-import model.Product;
+import model.Customer;
 
-public class ProductOperation{
-    private static ProductOperation instance;
-    private static final String PRODUCT_FILE = "data/products.txt";
+public class CustomerOperation{
+    private static CustomerOperation instance;
+    private static final String USER_FILE = "data/users.txt";
     private static final int PAGE_SIZE = 10;
-    
-    static {
-        Platform.startup(() -> {});
+
+    private CustomerOperation(){
     }
-    
-    private ProductOperation(){
-    }
-    
-    public static ProductOperation getInstance(){
+
+    public static CustomerOperation getInstance(){
         if (instance == null){
-            instance = new ProductOperation();
+            instance = new CustomerOperation();
         }
         return instance;
     }
+
+    public boolean validateEmail(String userEmail){
+        if (userEmail == null)
+            return false;
+        return Pattern.compile("^[\\w.%+-]+@[\\w.-]+\\.[a-zA-Z]{2,}$").matcher(userEmail).matches();
+    }
+
+    public boolean validateMobile(String userMobile){
+        if (userMobile == null)
+            return false;
+        return Pattern.compile("^(04|03)\\d{8}$").matcher(userMobile).matches();
+    }
     
-    public void extractProductsFromFiles(){
-        File sourceFile = new File("data/products_source.txt");
-        File targetFile = new File(PRODUCT_FILE);
-        if (!sourceFile.exists()) {
-            System.err.println("Source file not found: " + sourceFile.getAbsolutePath());
-            return;
-        }
-        try (BufferedReader br = new BufferedReader(new FileReader(sourceFile));
-             PrintWriter pw = new PrintWriter(new FileWriter(targetFile, false))) {
-            String line;
-            while ((line = br.readLine()) != null){
-                if (!line.trim().isEmpty()){
-                    pw.println(line);
+    public boolean registerCustomer(String userName, String userPassword, String userEmail, String userMobile){
+        if (checkUsernameExist(userName))
+            return false;
+        if (!validateEmail(userEmail) || !validateMobile(userMobile))
+            return false;
+        String userId = generateUniqueUserId();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy_HH:mm:ss");
+        String registerTime = LocalDateTime.now().format(formatter);
+        JSONObject customerObj = new JSONObject();
+        customerObj.put("user_id", userId);
+        customerObj.put("user_name", userName);
+        customerObj.put("user_password", encryptPassword(userPassword));
+        customerObj.put("user_register_time", registerTime);
+        customerObj.put("user_role", "customer");
+        customerObj.put("user_email", userEmail);
+        customerObj.put("user_mobile", userMobile);
+        writeUserToFile(customerObj);
+        return true;
+    }
+    
+    public boolean updateProfile(String attributeName, String value, Customer customerObject){
+        if (customerObject == null)
+            return false;
+        boolean valid = false;
+        switch (attributeName.toLowerCase()){
+            case "username":
+                if (validateUsername(value)){
+                    customerObject.setUserName(value);
+                    valid = true;
                 }
-            }
-            pw.flush();
-        } catch (IOException e) {
-            System.err.println("Error extracting products: " + e.getMessage());
+                break;
+            case "userpassword":
+                if (validatePassword(value)){
+                    customerObject.setUserPassword(encryptPassword(value));
+                    valid = true;
+                }
+                break;
+            case "useremail":
+                if (validateEmail(value)){
+                    customerObject.setUserEmail(value);
+                    valid = true;
+                }
+                break;
+            case "usermobile":
+                if (validateMobile(value)){
+                    customerObject.setUserMobile(value);
+                    valid = true;
+                }
+                break;
+            default:
+                valid = false;
         }
+        if (valid)
+            updateUserInFile(customerObject);
+        return valid;
     }
     
-    public ProductListResult getProductList(int pageNumber){
-        List<Product> allProducts = readProductsFromFile();
-        int totalProducts = allProducts.size();
-        int totalPages = (totalProducts + PAGE_SIZE - 1) / PAGE_SIZE;
-        if (pageNumber < 1){
-            pageNumber = 1;
-        }
-        if (pageNumber > totalPages && totalPages > 0){
-            pageNumber = totalPages;
-        }
-        int startIndex = (pageNumber - 1) * PAGE_SIZE;
-        int endIndex = Math.min(startIndex + PAGE_SIZE, totalProducts);
-        List<Product> pageProducts = allProducts.subList(startIndex, endIndex);
-        return new ProductListResult(pageProducts, pageNumber, totalPages);
-    }
-    
-    public boolean deleteProduct(String productId){
-        List<Product> allProducts = readProductsFromFile();
+    public boolean deleteCustomer(String customerId){
+        List<JSONObject> users = readUsersFromFile();
         boolean found = false;
-        Iterator<Product> iterator = allProducts.iterator();
-        while (iterator.hasNext()){
-            Product p = iterator.next();
-            if (p.getProId().equals(productId)){
-                iterator.remove();
+        Iterator<JSONObject> it = users.iterator();
+        while (it.hasNext()) {
+            JSONObject obj = it.next();
+            String role = (String) obj.get("user_role");
+            if (role != null && role.equalsIgnoreCase("customer") && obj.get("user_id").equals(customerId)) {
+                it.remove();
                 found = true;
                 break;
             }
         }
-        if (found) {
-            writeProductsToFile(allProducts);
-        }
+        if (found)
+            overwriteUsersFile(users);
         return found;
     }
     
-    public List<Product> getProductListByKeyword(String keyword){
-        List<Product> allProducts = readProductsFromFile();
-        List<Product> result = new ArrayList<>();
-        for (Product p : allProducts) {
-            if (p.getProName().toLowerCase().contains(keyword.toLowerCase())){
-                result.add(p);
+    public CustomerListResult getCustomerList(int pageNumber){
+        List<Customer> allCustomers = getAllCustomers();
+        int totalCustomers = allCustomers.size();
+        int totalPages = (totalCustomers + PAGE_SIZE - 1) / PAGE_SIZE;
+        if (pageNumber < 1)
+            pageNumber = 1;
+        if (pageNumber > totalPages && totalPages > 0)
+            pageNumber = totalPages;
+        int startIndex = (pageNumber - 1) * PAGE_SIZE;
+        int endIndex = Math.min(startIndex + PAGE_SIZE, totalCustomers);
+        List<Customer> pageList = new ArrayList<>(allCustomers.subList(startIndex, endIndex));
+        return new CustomerListResult(pageList, pageNumber, totalPages);
+    }
+    
+    public void deleteAllCustomers(){
+        List<JSONObject> users = readUsersFromFile();
+        Iterator<JSONObject> it = users.iterator();
+        while (it.hasNext()) {
+            JSONObject obj = it.next();
+            String role = (String) obj.get("user_role");
+            if (role != null && role.equalsIgnoreCase("customer")) {
+                it.remove();
             }
         }
-        return result;
+        overwriteUsersFile(users);
     }
     
-    public Product getProductById(String productId){
-        List<Product> allProducts = readProductsFromFile();
-        for (Product p : allProducts) {
-            if (p.getProId().equals(productId)) {
-                return p;
+    private List<Customer> getAllCustomers(){
+        List<Customer> customers = new ArrayList<>();
+        List<JSONObject> users = readUsersFromFile();
+        for (JSONObject obj : users) {
+            String role = (String) obj.get("user_role");
+            if (role != null && role.equalsIgnoreCase("customer")){
+                String userId = (String) obj.get("user_id");
+                String userName = (String) obj.get("user_name");
+                String userPassword = (String) obj.get("user_password");
+                String userRegisterTime = (String) obj.get("user_register_time");
+                String userEmail = (String) obj.get("user_email");
+                String userMobile = (String) obj.get("user_mobile");
+                Customer customer = new Customer(userId, userName, userPassword, userRegisterTime, role, userEmail, userMobile);
+                customers.add(customer);
             }
         }
-        return null;
+        return customers;
     }
     
-    public void generateCategoryFigure(){
-        Platform.runLater(() -> {
-            List<Product> products = readProductsFromFile();
-            java.util.Map<String, Integer> categoryCount = new java.util.HashMap<>();
-            for (Product p : products) {
-                String cat = p.getProCategory();
-                categoryCount.put(cat, categoryCount.getOrDefault(cat, 0) + 1);
-            }
-            CategoryAxis xAxis = new CategoryAxis();
-            xAxis.setLabel("Category");
-            NumberAxis yAxis = new NumberAxis();
-            yAxis.setLabel("Count");
-            BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
-            barChart.setTitle("Products by Category");
-            XYChart.Series<String, Number> series = new XYChart.Series<>();
-            for (java.util.Map.Entry<String, Integer> entry : categoryCount.entrySet()) {
-                series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
-            }
-            barChart.getData().add(series);
-            Scene scene = new Scene(barChart, 800, 600);
-            WritableImage image = scene.snapshot(null);
-            File outputDir = new File("data/figure");
-            if (!outputDir.exists()) {
-                outputDir.mkdirs();
-            }
-            File file = new File(outputDir, "category_chart.png");
-            try {
-                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-    }
-    
-    public void generateDiscountFigure(){
-        Platform.runLater(() -> {
-            List<Product> products = readProductsFromFile();
-            int lessThan30 = 0, between30And60 = 0, greaterThan60 = 0;
-            for (Product p : products) {
-                double discount = p.getProDiscount();
-                if (discount < 30) {
-                    lessThan30++;
-                } else if (discount <= 60) {
-                    between30And60++;
-                } else {
-                    greaterThan60++;
-                }
-            }
-            PieChart pieChart = new PieChart();
-            pieChart.setTitle("Discount Distribution");
-            pieChart.getData().add(new PieChart.Data("Less than 30", lessThan30));
-            pieChart.getData().add(new PieChart.Data("30 to 60", between30And60));
-            pieChart.getData().add(new PieChart.Data("Greater than 60", greaterThan60));
-            Scene scene = new Scene(pieChart, 800, 600);
-            WritableImage image = scene.snapshot(null);
-            File outputDir = new File("data/figure");
-            if (!outputDir.exists()) {
-                outputDir.mkdirs();
-            }
-            File file = new File(outputDir, "discount_chart.png");
-            try {
-                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-    }
-    
-    public void generateLikesCountFigure(){
-        Platform.runLater(() -> {
-            List<Product> products = readProductsFromFile();
-            java.util.Map<String, Integer> likesByCategory = new java.util.HashMap<>();
-            for (Product p : products) {
-                String cat = p.getProCategory();
-                likesByCategory.put(cat, likesByCategory.getOrDefault(cat, 0) + p.getProLikesCount());
-            }
-            List<java.util.Map.Entry<String, Integer>> entryList = new ArrayList<>(likesByCategory.entrySet());
-            entryList.sort(java.util.Map.Entry.comparingByValue());
-            CategoryAxis xAxis = new CategoryAxis();
-            xAxis.setLabel("Category");
-            NumberAxis yAxis = new NumberAxis();
-            yAxis.setLabel("Total Likes");
-            BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
-            barChart.setTitle("Total Likes by Category (Ascending)");
-            XYChart.Series<String, Number> series = new XYChart.Series<>();
-            for (java.util.Map.Entry<String, Integer> entry : entryList) {
-                series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
-            }
-            barChart.getData().add(series);
-            Scene scene = new Scene(barChart, 800, 600);
-            WritableImage image = scene.snapshot(null);
-            File outputDir = new File("data/figure");
-            if (!outputDir.exists()) {
-                outputDir.mkdirs();
-            }
-            File file = new File(outputDir, "likes_count_chart.png");
-            try {
-                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-    }
-    
-    public void generateDiscountLikesCountFigure(){
-        Platform.runLater(() -> {
-            List<Product> products = readProductsFromFile();
-            CategoryAxis xAxis = new CategoryAxis();
-            xAxis.setLabel("Discount (%)");
-            NumberAxis yAxis = new NumberAxis();
-            yAxis.setLabel("Likes Count");
-            ScatterChart<String, Number> scatterChart = new ScatterChart<>(xAxis, yAxis);
-            scatterChart.setTitle("Likes Count vs Discount");
-            XYChart.Series<String, Number> series = new XYChart.Series<>();
-            for (Product p : products) {
-                series.getData().add(new XYChart.Data<>(Double.toString(p.getProDiscount()), p.getProLikesCount()));
-            }
-            scatterChart.getData().add(series);
-            Scene scene = new Scene(scatterChart, 800, 600);
-            WritableImage image = scene.snapshot(null);
-            File outputDir = new File("data/figure");
-            if (!outputDir.exists()) {
-                outputDir.mkdirs();
-            }
-            File file = new File(outputDir, "discount_likes_scatter.png");
-            try {
-                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-    }
-    
-    public void deleteAllProducts(){
-        try (PrintWriter writer = new PrintWriter(new FileWriter(PRODUCT_FILE, false))) {
-            writer.print("");
-        } catch (IOException e) {
-            System.err.println("Error deleting all products: " + e.getMessage());
+    private boolean checkUsernameExist(String userName){
+        List<JSONObject> users = readUsersFromFile();
+        for (JSONObject obj : users){
+            String name = (String) obj.get("user_name");
+            if (name.equalsIgnoreCase(userName))
+                return true;
         }
+        return false;
     }
     
-    private List<Product> readProductsFromFile(){
-        List<Product> products = new ArrayList<>();
-        File file = new File(PRODUCT_FILE);
-        if (!file.exists()) {
-            return products;
+    private String generateUniqueUserId(){
+        List<JSONObject> users = readUsersFromFile();
+        int maxId = 0;
+        for (JSONObject obj : users) {
+            String id = (String) obj.get("user_id");
+            if (id != null && id.matches("^u_\\d{10}$")){
+                int num = Integer.parseInt(id.substring(2));
+                if (num > maxId)
+                    maxId = num;
+            }
+        }
+        int newId = maxId + 1;
+        return String.format("u_%010d", newId);
+    }
+    
+    private String encryptPassword(String userPassword){
+        return "^^" + userPassword + "$$";
+    }
+    
+    private boolean validateUsername(String userName){
+        if (userName == null)
+            return false;
+        return userName.matches("[a-zA-Z_]{5,}");
+    }
+    
+    private boolean validatePassword(String userPassword){
+        if (userPassword == null)
+            return false;
+        return userPassword.matches("^(?=.*[a-zA-Z])(?=.*\\d).{5,}$");
+    }
+    
+    private List<JSONObject> readUsersFromFile(){
+        List<JSONObject> list = new ArrayList<>();
+        File file = new File(USER_FILE);
+        if (!file.exists()){
+            return list;
         }
         JSONParser parser = new JSONParser();
-        try (BufferedReader reader = new BufferedReader(new FileReader(PRODUCT_FILE))){
+        try (BufferedReader reader = new BufferedReader(new FileReader(USER_FILE))){
             String line;
-            while ((line = reader.readLine()) != null) {
+            while ((line = reader.readLine()) != null){
                 if (line.trim().isEmpty())
                     continue;
                 try {
-                    JSONObject json = (JSONObject) parser.parse(line);
-                    String proId = (String) json.get("pro_id");
-                    String proModel = (String) json.get("pro_model");
-                    String proCategory = (String) json.get("pro_category");
-                    String proName = (String) json.get("pro_name");
-                    double proCurrentPrice = Double.parseDouble(json.get("pro_current_price").toString());
-                    double proRawPrice = Double.parseDouble(json.get("pro_raw_price").toString());
-                    double proDiscount = Double.parseDouble(json.get("pro_discount").toString());
-                    int proLikesCount = Integer.parseInt(json.get("pro_likes_count").toString());
-                    Product product = new Product(proId, proModel, proCategory, proName,
-                                                  proCurrentPrice, proRawPrice, proDiscount, proLikesCount);
-                    products.add(product);
-                } catch (ParseException pe){
-                    System.err.println("Error parsing product JSON: " + pe.getMessage());
+                    JSONObject obj = (JSONObject) parser.parse(line);
+                    list.add(obj);
+                } catch (ParseException pe) {
+                    System.err.println("Error parsing user JSON: " + pe.getMessage());
                 }
             }
-        } catch (IOException e){
-            System.err.println("Error reading products from file: " + e.getMessage());
-        }
-        return products;
-    }
-    
-    private void writeProductsToFile(List<Product> products) {
-        try (PrintWriter writer = new PrintWriter(new FileWriter(PRODUCT_FILE, false))) {
-            for (Product p : products) {
-                writer.println(p.toString());
-            }
         } catch (IOException e) {
-            System.err.println("Error writing products to file: " + e.getMessage());
+            System.err.println("Error reading user file: " + e.getMessage());
+        }
+        return list;
+    }
+    
+    private void writeUserToFile(JSONObject userObj){
+        try (PrintWriter writer = new PrintWriter(new FileWriter(USER_FILE, true))) {
+            writer.println(userObj.toJSONString());
+        } catch (IOException e){
+            System.err.println("Error writing user to file: " + e.getMessage());
         }
     }
     
-    public static class ProductListResult{
-        private List<Product> productList;
+    private void updateUserInFile(Customer customer){
+        List<JSONObject> users = readUsersFromFile();
+        for (JSONObject obj : users) {
+            if (obj.get("user_id").equals(customer.getUserId())) {
+                obj.put("user_name", customer.getUserName());
+                obj.put("user_password", customer.getUserPassword());
+                obj.put("user_email", customer.getUserEmail());
+                obj.put("user_mobile", customer.getUserMobile());
+                break;
+            }
+        }
+        overwriteUsersFile(users);
+    }
+    
+    private void overwriteUsersFile(List<JSONObject> users){
+        try (PrintWriter writer = new PrintWriter(new FileWriter(USER_FILE, false))){
+            for (JSONObject obj : users){
+                writer.println(obj.toJSONString());
+            }
+        } catch (IOException e){
+            System.err.println("Error overwriting user file: " + e.getMessage());
+        }
+    }
+    
+    public static class CustomerListResult{
+        private List<Customer> customerList;
         private int currentPage;
         private int totalPages;
         
-        public ProductListResult(List<Product> productList, int currentPage, int totalPages) {
-            this.productList = productList;
+        public CustomerListResult(List<Customer> customerList, int currentPage, int totalPages){
+            this.customerList = customerList;
             this.currentPage = currentPage;
             this.totalPages = totalPages;
         }
         
-        public List<Product> getProductList(){
-            return productList;
+        public List<Customer> getCustomerList(){
+            return customerList;
         }
         
         public int getCurrentPage(){
