@@ -77,8 +77,8 @@ public class CustomerOperation{
                 }
                 break;
             case "userpassword":
-                if (validatePassword(value)){
-                    customerObject.setUserPassword(encryptPassword(value));
+                if (validatePassword(value)) {
+                    customerObject.setUserPassword(UserOperation.getInstance().encryptPassword(value));
                     valid = true;
                 }
                 break;
