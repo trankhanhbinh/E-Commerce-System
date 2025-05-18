@@ -1,190 +1,202 @@
+import java.io.File;
 import java.util.List;
-import Interfaceio.IOInterface;
-import operation.*;
-import model.*;
+import java.util.Scanner;
+import Assignment.src.model.User;
+import Assignment.src.model.Order;
+import Assignment.src.operation.AdminOperation;
+import Assignment.src.operation.CustomerOperation;
+import Assignment.src.operation.OrderOperation;
+import Assignment.src.operation.ProductOperation;
+import Assignment.src.operation.UserOperation;
+import javafx.application.Platform;
+import Assignment.src.Interfaceio.IOInterface;
 
-public class Main{
-    public static void main(String[] args){
+public class Main {
+    public static void main(String[] args) {
+        AdminOperation.getInstance().registerAdmin();
+
+        Scanner scanner = new Scanner(System.in);
         IOInterface io = IOInterface.getInstance();
-        UserOperation userOp = UserOperation.getInstance();
-        CustomerOperation customerOp = CustomerOperation.getInstance();
-        AdminOperation adminOp = AdminOperation.getInstance();
 
-        io.printMessage("Welcome to the E-Commerce System!");
-        while (true) {
+        System.out.println("Working Directory = " + new File(".").getAbsolutePath());
+
+        Platform.startup(() ->
+        {
+        // This block will be executed on JavaFX Thread
+        });
+
+        boolean exit = false;
+        while (!exit) {
             io.mainMenu();
-            String[] input = io.getUserInput("Choose an option:", 1);
-            String choice = input[0];
-
-            switch (choice){
-                case "1":
-                    login();
+            System.out.print("Enter your option: ");
+            String choice = scanner.nextLine().trim();
+            switch (choice) {
+                case "1": // Login
+                    System.out.print("Username: ");
+                    String username = scanner.nextLine().trim();
+                    System.out.print("Password: ");
+                    String password = scanner.nextLine().trim();
+                    
+                    User user = UserOperation.getInstance().login(username, password);
+                    if (user == null) {
+                        io.printErrorMessage("Login", "Invalid credentials. Please try again.");
+                    } else {
+                        io.printMessage("Login successful. Welcome, " + user.getUserName() + "!");
+                        if (user.getUserRole().equalsIgnoreCase("admin")) {
+                            adminMenu(user);
+                        } else {
+                            customerMenu(user);
+                        }
+                    }
                     break;
-                case "2":
-                    registerCustomer();
+                case "2": // Register new customer
+                    System.out.print("Enter username: ");
+                    String regUsername = scanner.nextLine().trim();
+                    System.out.print("Enter password: ");
+                    String regPassword = scanner.nextLine().trim();
+                    System.out.print("Enter email: ");
+                    String email = scanner.nextLine().trim();
+                    System.out.print("Enter mobile number: ");
+                    String mobile = scanner.nextLine().trim();
+                    
+                    boolean regSuccess = CustomerOperation.getInstance().registerCustomer(regUsername, regPassword, email, mobile);
+                    if (regSuccess) {
+                        io.printMessage("Registration successful. You can now log in.");
+                    } else {
+                        io.printErrorMessage("Registration", "Registration failed. Username may already exist or data format is incorrect.");
+                    }
                     break;
-                case "3":
-                    io.printMessage("Exiting system...");
-                    return;
+                case "3": // Quit
+                    io.printMessage("Goodbye!");
+                    exit = true;
+                    break;
                 default:
-                    io.printErrorMessage("Main Menu", "Invalid option. Please choose 1, 2, or 3.");
+                    io.printErrorMessage("Main Menu", "Invalid choice. Please select 1, 2, or 3.");
             }
         }
+        scanner.close();
     }
 
-    private static void login(){
+    private static void adminMenu(User adminUser) {
+        Scanner scanner = new Scanner(System.in);
         IOInterface io = IOInterface.getInstance();
-        UserOperation userOp = UserOperation.getInstance();
-        
-        io.printMessage("Login Page");
-        String[] credentials = io.getUserInput("Enter username and password:", 2);
-        String username = credentials[0];
-        String password = credentials[1];
-
-        User user = userOp.login(username, password);
-        if (user == null) {
-            io.printErrorMessage("Login", "Invalid credentials.");
-            return;
-        }
-
-        io.printMessage("Login successful!");
-        if (user instanceof Admin) {
-            adminMenu((Admin) user);
-        } else if (user instanceof Customer) {
-            customerMenu((Customer) user);
-        }
-    }
-
-    private static void registerCustomer() {
-        IOInterface io = IOInterface.getInstance();
-        CustomerOperation customerOp = CustomerOperation.getInstance();
-
-        io.printMessage("Customer Registration");
-        String[] details = io.getUserInput("Enter username, password, email, and mobile:", 4);
-        String username = details[0];
-        String password = details[1];
-        String email = details[2];
-        String mobile = details[3];
-
-        boolean success = customerOp.registerCustomer(username, password, email, mobile);
-        if (success) {
-            io.printMessage("Registration successful!");
-        } else {
-            io.printErrorMessage("Registration", "Failed to register. Please check your details.");
-        }
-    }
-
-    private static void adminMenu(Admin admin) {
-        IOInterface io = IOInterface.getInstance();
-        AdminOperation adminOp = AdminOperation.getInstance();
-
-        while (true) {
+        boolean logout = false;
+        while (!logout) {
             io.adminMenu();
-            String[] input = io.getUserInput("Choose an option:", 1);
-            String choice = input[0];
-
-            switch (choice) {
-                case "1":
-                    showProducts();
+            System.out.print("Enter your choice: ");
+            String option = scanner.nextLine().trim();
+            switch (option) {
+                case "1": // Show products
+                    System.out.print("Enter page number for product list: ");
+                    int pPage = Integer.parseInt(scanner.nextLine().trim());
+                    ProductOperation.ProductListResult pr = ProductOperation.getInstance().getProductList(pPage);
+                    io.showList(adminUser.getUserRole(), "Product", pr.getProductList(), pr.getCurrentPage(), pr.getTotalPages());
                     break;
-                case "2":
-                    addCustomers();
+                case "2": // Add customers
+                    System.out.print("Enter new customer's username: ");
+                    String username = scanner.nextLine().trim();
+                    System.out.print("Enter password: ");
+                    String pwd = scanner.nextLine().trim();
+                    System.out.print("Enter email: ");
+                    String email = scanner.nextLine().trim();
+                    System.out.print("Enter mobile: ");
+                    String mobile = scanner.nextLine().trim();
+                    if (CustomerOperation.getInstance().registerCustomer(username, pwd, email, mobile)) {
+                        io.printMessage("Customer added successfully.");
+                    } else {
+                        io.printErrorMessage("Add Customer", "Failed to add customer.");
+                    }
                     break;
-                case "3":
-                    showCustomers();
+                case "3": // Show customers
+                    System.out.print("Enter page number for customer list: ");
+                    int cPage = Integer.parseInt(scanner.nextLine().trim());
+                    CustomerOperation.CustomerListResult cr = CustomerOperation.getInstance().getCustomerList(cPage);
+                    io.showList(adminUser.getUserRole(), "Customer", cr.getCustomerList(), cr.getCurrentPage(), cr.getTotalPages());
                     break;
-                case "4":
-                    showOrders();
+                case "4": // Show orders for admin
+                    System.out.print("Enter page number for order list: ");
+                    int oPage = Integer.parseInt(scanner.nextLine().trim());
+                    List<Order> orders = OrderOperation.getInstance().getOrderList("all", oPage).getOrderList();
+                    io.showList(adminUser.getUserRole(), "Order", orders, oPage, 0);
                     break;
-                case "5":
-                    adminOp.registerAdmin();
+                case "5": // Generate test data (for orders)
+                    OrderOperation.getInstance().generateTestOrderData();
+                    io.printMessage("Test order data generated successfully.");
                     break;
-                case "6":
-                    io.printMessage("Generating statistical figures...");
+                case "6": // Generate all statistical figures
+                    ProductOperation.getInstance().generateCategoryFigure();
+                    ProductOperation.getInstance().generateDiscountFigure();
+                    ProductOperation.getInstance().generateLikesCountFigure();
+                    ProductOperation.getInstance().generateDiscountLikesCountFigure();
+                    OrderOperation.getInstance().generateAllCustomersConsumptionFigure();
+                    OrderOperation.getInstance().generateAllTop10BestSellersFigure();
+                    io.printMessage("All statistical figures generated. Please check the data/figure folder.");
                     break;
-                case "7":
-                    io.printMessage("Deleting all data...");
+                case "7": // Delete all data
+                    CustomerOperation.getInstance().deleteAllCustomers();
+                    ProductOperation.getInstance().deleteAllProducts();
+                    OrderOperation.getInstance().deleteAllOrders();
+                    io.printMessage("All data deleted successfully.");
                     break;
-                case "8":
-                    io.printMessage("Logging out...");
-                    return;
+                case "8": // Logout
+                    io.printMessage("Logging out, returning to main menu.");
+                    logout = true;
+                    break;
                 default:
                     io.printErrorMessage("Admin Menu", "Invalid option.");
+                    break;
             }
         }
     }
 
-    private static void customerMenu(Customer customer){
+    private static void customerMenu(User customerUser) {
+        Scanner scanner = new Scanner(System.in);
         IOInterface io = IOInterface.getInstance();
-        CustomerOperation customerOp = CustomerOperation.getInstance();
-
-        while (true) {
+        boolean logout = false;
+        while (!logout) {
             io.customerMenu();
-            String[] input = io.getUserInput("Choose an option:", 1);
-            String choice = input[0];
-
-            switch (choice) {
-                case "1":
-                    io.printObject(customer);
+            System.out.print("Enter your choice: ");
+            String option = scanner.nextLine().trim();
+            switch (option) {
+                case "1": // Show profile
+                    io.printObject(customerUser);
                     break;
-                case "2":
-                    updateProfile(customer);
+                case "2": // Update profile
+                    System.out.print("Enter attribute to update (username, userpassword, useremail, usermobile): ");
+                    String attr = scanner.nextLine().trim();
+                    System.out.print("Enter new value: ");
+                    String newVal = scanner.nextLine().trim();
+                    boolean updated = CustomerOperation.getInstance().updateProfile(attr, newVal, (Assignment.src.model.Customer) customerUser);
+                    if (updated) {
+                        io.printMessage("Profile updated successfully.");
+                    } else {
+                        io.printErrorMessage("Update Profile", "Update failed. Please check your input.");
+                    }
                     break;
-                case "3":
-                    showProducts();
+                case "3": // Show products
+                    System.out.print("Enter page number for product list: ");
+                    int pPage = Integer.parseInt(scanner.nextLine().trim());
+                    ProductOperation.ProductListResult pr = ProductOperation.getInstance().getProductList(pPage);
+                    io.showList(customerUser.getUserRole(), "Product", pr.getProductList(), pr.getCurrentPage(), pr.getTotalPages());
                     break;
-                case "4":
-                    showOrders();
+                case "4": // Show history orders
+                    System.out.print("Enter page number for your orders: ");
+                    int oPage = Integer.parseInt(scanner.nextLine().trim());
+                    List<Order> orders = OrderOperation.getInstance().getOrderList(customerUser.getUserId(), oPage).getOrderList();
+                    io.showList(customerUser.getUserRole(), "Your Order", orders, oPage, 0);
                     break;
-                case "5":
-                    io.printMessage("Generating consumption figures...");
+                case "5": // Generate consumption figure
+                    OrderOperation.getInstance().generateSingleCustomerConsumptionFigure(customerUser.getUserId());
+                    io.printMessage("Consumption figure generated. Please check data/figure folder.");
                     break;
-                case "6":
-                    io.printMessage("Logging out...");
-                    return;
+                case "6": // Logout
+                    io.printMessage("Logging out, returning to main menu.");
+                    logout = true;
+                    break;
                 default:
                     io.printErrorMessage("Customer Menu", "Invalid option.");
+                    break;
             }
         }
-    }
-
-    private static void updateProfile(Customer customer){
-        IOInterface io = IOInterface.getInstance();
-        CustomerOperation customerOp = CustomerOperation.getInstance();
-
-        String[] input = io.getUserInput("Enter attribute to update and new value:", 2);
-        String attribute = input[0];
-        String value = input[1];
-
-        boolean success = customerOp.updateProfile(attribute, value, customer);
-        if (success) {
-            io.printMessage("Profile updated successfully!");
-        } else {
-            io.printErrorMessage("Update Profile", "Failed to update.");
-        }
-    }
-
-    private static void showProducts() {
-        IOInterface io = IOInterface.getInstance();
-        ProductOperation productOp = ProductOperation.getInstance();
-
-        List<Product> products = productOp.getProductList(1).getProducts();
-        io.showList("User", "Products", products, 1, 1);
-    }
-
-    private static void showOrders(){
-        IOInterface io = IOInterface.getInstance();
-        OrderOperation orderOp = OrderOperation.getInstance();
-
-        List<Order> orders = orderOp.getOrderList("customerId", 1).getOrders();
-        io.showList("Customer", "Orders", orders, 1, 1);
-    }
-
-    private static void addCustomers(){
-        IOInterface io = IOInterface.getInstance();
-        AdminOperation adminOp = AdminOperation.getInstance();
-
-        io.printMessage("Adding customer...");
-        registerCustomer();
     }
 }
