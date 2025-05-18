@@ -1,4 +1,4 @@
-package operation;
+package Assignment.src.operation;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,7 +20,6 @@ import org.json.simple.parser.ParseException;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Scene;
-import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
@@ -29,8 +28,8 @@ import javafx.scene.image.WritableImage;
 import javax.imageio.ImageIO;
 
 
-import model.Order;
-import model.Product;
+import Assignment.src.model.Order;
+import Assignment.src.model.Product;
 
 public class OrderOperation{
     private static OrderOperation instance;
@@ -138,21 +137,21 @@ public class OrderOperation{
     }
     public OrderListResult getOrderList(String customerId, int pageNumber){
         List<Order> orders = readOrdersFromFile();
-        List<Order> customerOrders = new ArrayList<>();
+        List<Order> filteredOrders = new ArrayList<>();
         for (Order order : orders) {
-            if (order.getUserId().equals(customerId)){
-                customerOrders.add(order);
+            if ("all".equalsIgnoreCase(customerId) || order.getUserId().equals(customerId)) {
+                filteredOrders.add(order);
             }
         }
-        int totalOrders = customerOrders.size();
-        int totalPages = (totalOrders + PAGE_SIZE - 1)/PAGE_SIZE;
+        int totalOrders = filteredOrders.size();
+        int totalPages = (totalOrders + PAGE_SIZE - 1) / PAGE_SIZE;
         if (pageNumber < 1)
             pageNumber = 1;
         if (pageNumber > totalPages && totalPages > 0)
             pageNumber = totalPages;
         int startIndex = (pageNumber - 1) * PAGE_SIZE;
         int endIndex = Math.min(startIndex + PAGE_SIZE, totalOrders);
-        List<Order> pageList = new ArrayList<>(customerOrders.subList(startIndex, endIndex));
+        List<Order> pageList = new ArrayList<>(filteredOrders.subList(startIndex, endIndex));
         return new OrderListResult(pageList, pageNumber, totalPages);
     }
     

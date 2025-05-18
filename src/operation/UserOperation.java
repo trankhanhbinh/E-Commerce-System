@@ -1,4 +1,4 @@
-package operation;
+package Assignment.src.operation;
 
 import java.io.*;
 import java.util.*;
@@ -6,9 +6,9 @@ import java.util.regex.Pattern;
 import org.json.simple.*;
 import org.json.simple.parser.*;
 
-import model.User;
-import model.Admin;
-import model.Customer;
+import Assignment.src.model.User;
+import Assignment.src.model.Admin;
+import Assignment.src.model.Customer;
 
 public class UserOperation {
     private static UserOperation instance;
@@ -16,7 +16,8 @@ public class UserOperation {
     private static final String ID_PREFIX = "u_";
     private static final Random RANDOM = new Random();
 
-    private UserOperation() {}
+    private UserOperation(){
+    }
 
     public static UserOperation getInstance() {
         if (instance == null) {
@@ -39,15 +40,17 @@ public class UserOperation {
         return ID_PREFIX + number;
     }
 
-    public String encryptPassword(String userPassword) {
-        if (userPassword == null || userPassword.isEmpty()) return null;
-        StringBuilder encrypted = new StringBuilder("^^");
-        String randomChars = generateRandomString(userPassword.length() * 2);
-        for (int i = 0; i < userPassword.length(); i++) {
-            encrypted.append(randomChars.charAt(i * 2)).append(randomChars.charAt(i * 2 + 1)).append(userPassword.charAt(i));
-        }
-        encrypted.append("$$");
-        return encrypted.toString();
+    String encryptPassword(String userPassword) {
+    if (userPassword == null || userPassword.isEmpty()) return null;
+    StringBuilder encrypted = new StringBuilder("^^");
+    String randomChars = UserOperation.getInstance().generateRandomString(userPassword.length() * 2);
+    for (int i = 0; i < userPassword.length(); i++) {
+        encrypted.append(randomChars.charAt(i * 2))
+                 .append(randomChars.charAt(i * 2 + 1))
+                 .append(userPassword.charAt(i));
+    }
+    encrypted.append("$$");
+    return encrypted.toString();
     }
 
     public String decryptPassword(String encryptedPassword) {
@@ -85,33 +88,34 @@ public class UserOperation {
     }
 
     public User login(String userName, String userPassword) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(USER_FILE))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                JSONObject json = (JSONObject) new JSONParser().parse(line);
-                String storedUserName = (String) json.get("user_name");
-                if (storedUserName.equals(userName)) {
-                    String encryptedPass = (String) json.get("user_password");
-                    String decryptedPass = decryptPassword(encryptedPass);
-    
-                    if (userPassword.equals(decryptedPass)) {
-                        String userId = (String) json.get("user_id");
-                        String userRegisterTime = (String) json.get("user_register_time");
-                        String userRole = (String) json.get("user_role");
-                        // Use the loading constructor
-                        if ("admin".equalsIgnoreCase(userRole)) {
-                            return new Admin(userId, storedUserName, encryptedPass, userRegisterTime, userRole, true);
-                        } else {
-                            String userEmail = (String) json.get("user_email");
-                            String userMobile = (String) json.get("user_mobile");
-                            return new Customer(userId, storedUserName, encryptedPass, userRegisterTime, userRole, userEmail, userMobile, true);
-                        }
+    try (BufferedReader reader = new BufferedReader(new FileReader(USER_FILE))) {
+        String line;
+        while ((line = reader.readLine()) != null) {
+            JSONObject json = (JSONObject) new JSONParser().parse(line);
+            String storedUserName = (String) json.get("user_name");
+            if (storedUserName.equals(userName)) {
+                String encryptedPass = (String) json.get("user_password");
+                String decryptedPass = decryptPassword(encryptedPass);
+
+                if (userPassword.equals(decryptedPass)) {
+                    String userId = (String) json.get("user_id");
+                    String userRegisterTime = (String) json.get("user_register_time");
+                    String userRole = (String) json.get("user_role");
+
+                    // Use the loading constructor (isLoading=true)
+                    if ("admin".equalsIgnoreCase(userRole)) {
+                        return new Admin(userId, storedUserName, encryptedPass, userRegisterTime, userRole, true);
+                    } else {
+                        String userEmail = (String) json.get("user_email");
+                        String userMobile = (String) json.get("user_mobile");
+                        return new Customer(userId, storedUserName, encryptedPass, userRegisterTime, userRole, userEmail, userMobile, true);
                     }
                 }
             }
-        } catch (IOException | ParseException e) {
-            System.err.println("Error during user login: " + e.getMessage());
         }
-    return null;
+    } catch (IOException | ParseException e) {
+        System.err.println("Error during user login: " + e.getMessage());
     }
+    return null;
+}
 }

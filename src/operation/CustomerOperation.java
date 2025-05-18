@@ -1,4 +1,4 @@
-package operation;
+package Assignment.src.operation;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -16,7 +16,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import model.Customer;
+import Assignment.src.model.Customer;
 
 public class CustomerOperation{
     private static CustomerOperation instance;
@@ -150,19 +150,24 @@ public class CustomerOperation{
     private List<Customer> getAllCustomers(){
         List<Customer> customers = new ArrayList<>();
         List<JSONObject> users = readUsersFromFile();
+        System.out.println("DEBUG: Total user objects read: " + users.size());
         for (JSONObject obj : users) {
             String role = (String) obj.get("user_role");
-            if (role != null && role.equalsIgnoreCase("customer")){
+            if (role != null && role.trim().equalsIgnoreCase("customer")){
                 String userId = (String) obj.get("user_id");
                 String userName = (String) obj.get("user_name");
                 String userPassword = (String) obj.get("user_password");
                 String userRegisterTime = (String) obj.get("user_register_time");
                 String userEmail = (String) obj.get("user_email");
                 String userMobile = (String) obj.get("user_mobile");
-                Customer customer = new Customer(userId, userName, userPassword, userRegisterTime, role, userEmail, userMobile);
+                
+                // Create the customer using the 'loading' constructor (bypassing duplicate check)
+                Customer customer = new Customer(userId, userName, userPassword, 
+                    userRegisterTime, role, userEmail, userMobile, true);
                 customers.add(customer);
             }
         }
+        System.out.println("DEBUG: Total loaded customers: " + customers.size());
         return customers;
     }
     

@@ -1,4 +1,4 @@
-package operation;
+package Assignment.src.operation;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -16,7 +16,6 @@ import org.json.simple.parser.ParseException;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Scene;
-import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
@@ -24,10 +23,9 @@ import javafx.scene.chart.PieChart;
 import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.image.WritableImage;
-import javafx.stage.Stage;
 import javax.imageio.ImageIO;
 
-import model.Product;
+import Assignment.src.model.Product;
 
 public class ProductOperation{
     private static ProductOperation instance;
