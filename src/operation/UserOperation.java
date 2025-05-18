@@ -93,18 +93,18 @@ public class UserOperation {
                 if (storedUserName.equals(userName)) {
                     String encryptedPass = (String) json.get("user_password");
                     String decryptedPass = decryptPassword(encryptedPass);
-
+    
                     if (userPassword.equals(decryptedPass)) {
                         String userId = (String) json.get("user_id");
                         String userRegisterTime = (String) json.get("user_register_time");
                         String userRole = (String) json.get("user_role");
-
+                        // Use the loading constructor
                         if ("admin".equalsIgnoreCase(userRole)) {
-                            return new Admin(userId, storedUserName, encryptedPass, userRegisterTime, userRole);
+                            return new Admin(userId, storedUserName, encryptedPass, userRegisterTime, userRole, true);
                         } else {
                             String userEmail = (String) json.get("user_email");
                             String userMobile = (String) json.get("user_mobile");
-                            return new Customer(userId, storedUserName, encryptedPass, userRegisterTime, userRole, userEmail, userMobile);
+                            return new Customer(userId, storedUserName, encryptedPass, userRegisterTime, userRole, userEmail, userMobile, true);
                         }
                     }
                 }
@@ -112,6 +112,6 @@ public class UserOperation {
         } catch (IOException | ParseException e) {
             System.err.println("Error during user login: " + e.getMessage());
         }
-        return null;
+    return null;
     }
 }
