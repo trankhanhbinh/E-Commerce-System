@@ -1,4 +1,4 @@
-package Interfaceio;
+package Assignment.src.Interfaceio;
 
 import java.util.Scanner;
 import java.util.List;
