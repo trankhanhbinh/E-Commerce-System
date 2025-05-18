@@ -1,17 +1,15 @@
-package Assignment.src;
-
 import java.io.File;
 import java.util.List;
 import java.util.Scanner;
-import Assignment.src.model.User;
-import Assignment.src.model.Order;
-import Assignment.src.operation.AdminOperation;
-import Assignment.src.operation.CustomerOperation;
-import Assignment.src.operation.OrderOperation;
-import Assignment.src.operation.ProductOperation;
-import Assignment.src.operation.UserOperation;
+import model.User;
+import model.Order;
+import operation.AdminOperation;
+import operation.CustomerOperation;
+import operation.OrderOperation;
+import operation.ProductOperation;
+import operation.UserOperation;
 import javafx.application.Platform;
-import Assignment.src.Interfaceio.IOInterface;
+import Interfaceio.IOInterface;
 
 public class Main {
     public static void main(String[] args) {
@@ -168,7 +166,7 @@ public class Main {
                     String attr = scanner.nextLine().trim();
                     System.out.print("Enter new value: ");
                     String newVal = scanner.nextLine().trim();
-                    boolean updated = CustomerOperation.getInstance().updateProfile(attr, newVal, (Assignment.src.model.Customer) customerUser);
+                    boolean updated = CustomerOperation.getInstance().updateProfile(attr, newVal, (model.Customer) customerUser);
                     if (updated) {
                         io.printMessage("Profile updated successfully.");
                     } else {
