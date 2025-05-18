@@ -166,7 +166,7 @@ public class Main {
                     String attr = scanner.nextLine().trim();
                     System.out.print("Enter new value: ");
                     String newVal = scanner.nextLine().trim();
-                    boolean updated = CustomerOperation.getInstance().updateProfile(attr, newVal, (Assignment.src.model.Customer) customerUser);
+                    boolean updated = CustomerOperation.getInstance().updateProfile(attr, newVal, (model.Customer) customerUser);
                     if (updated) {
                         io.printMessage("Profile updated successfully.");
                     } else {
