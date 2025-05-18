@@ -1,4 +1,4 @@
-package model;
+package Assignment.src.model;
 
 public class Product {
     //constructors
