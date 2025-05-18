@@ -29,8 +29,9 @@ public class User {
         this.userPassword = userPassword;
         this.userRegisterTime = userRegisterTime;
         this.userRole = userRole;
-                
-        usedUserIds.add(userId); // mark this ID as used
+        if (!isLoading && !usedUserIds.contains(userId)) {
+            usedUserIds.add(userId);
+        }
     }
     
         //default value
