@@ -1,4 +1,4 @@
-package Assignment.src.operation;
+package operation;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -27,7 +27,7 @@ import javafx.scene.image.WritableImage;
 import javafx.stage.Stage;
 import javax.imageio.ImageIO;
 
-import Assignment.src.model.Product;
+import model.Product;
 
 public class ProductOperation{
     private static ProductOperation instance;
