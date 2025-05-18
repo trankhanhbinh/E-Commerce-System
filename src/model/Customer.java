@@ -5,10 +5,14 @@ public class Customer extends User{
     private String userEmail;
     private String userMobile;
 
-    public Customer(String userId, String userName, String userPassword, 
-    String userRegisterTime, String userRole, String userEmail, String userMobile) {
-
+    public Customer(String userId, String userName, String userPassword, String userRegisterTime, String userRole, String userEmail, String userMobile) {
         super(userId, userName, userPassword, userRegisterTime, userRole);
+        this.userEmail = userEmail;
+        this.userMobile = userMobile;
+    }
+    // loading constructor
+    public Customer(String userId, String userName, String userPassword, String userRegisterTime, String userRole, String userEmail, String userMobile, boolean isLoading) {
+        super(userId, userName, userPassword, userRegisterTime, userRole, isLoading);
         this.userEmail = userEmail;
         this.userMobile = userMobile;
     }
