@@ -1,4 +1,4 @@
-package operation;
+package Assignment.src.operation;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -16,7 +16,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import model.Customer;
+import Assignment.src.model.Customer;
 
 public class CustomerOperation{
     private static CustomerOperation instance;
@@ -56,7 +56,7 @@ public class CustomerOperation{
         JSONObject customerObj = new JSONObject();
         customerObj.put("user_id", userId);
         customerObj.put("user_name", userName);
-        customerObj.put("user_password", encryptPassword(userPassword));
+        customerObj.put("user_password", UserOperation.getInstance().encryptPassword(userPassword));
         customerObj.put("user_register_time", registerTime);
         customerObj.put("user_role", "customer");
         customerObj.put("user_email", userEmail);
@@ -161,7 +161,6 @@ public class CustomerOperation{
                 String userEmail = (String) obj.get("user_email");
                 String userMobile = (String) obj.get("user_mobile");
                 
-                // Create the customer using the 'loading' constructor (bypassing duplicate check)
                 Customer customer = new Customer(userId, userName, userPassword, 
                     userRegisterTime, role, userEmail, userMobile, true);
                 customers.add(customer);
@@ -237,10 +236,23 @@ public class CustomerOperation{
         return list;
     }
     
-    private void writeUserToFile(JSONObject userObj){
+    private void writeUserToFile(JSONObject userObj) {
+        String orderedJSONString = String.format(
+            "{\"user_id\":\"%s\",\"user_name\":\"%s\",\"user_password\":\"%s\","+
+            "\"user_register_time\":\"%s\",\"user_role\":\"%s\",\"user_email\":\"%s\",\"user_mobile\":\"%s\"}",
+            userObj.get("user_id"),
+            userObj.get("user_name"),
+            userObj.get("user_password"),
+            userObj.get("user_register_time"),
+            userObj.get("user_role"),
+            userObj.get("user_email"),
+            userObj.get("user_mobile")
+        );
+
         try (PrintWriter writer = new PrintWriter(new FileWriter(USER_FILE, true))) {
-            writer.println(userObj.toJSONString());
-        } catch (IOException e){
+            writer.print("\n");
+            writer.print(orderedJSONString);
+        } catch (IOException e) {
             System.err.println("Error writing user to file: " + e.getMessage());
         }
     }
@@ -259,10 +271,24 @@ public class CustomerOperation{
         overwriteUsersFile(users);
     }
     
+    private String getOrderedJSONString(JSONObject obj) {
+        return String.format(
+            "{\"user_id\":\"%s\",\"user_name\":\"%s\",\"user_password\":\"%s\"," +
+            "\"user_register_time\":\"%s\",\"user_role\":\"%s\",\"user_email\":\"%s\",\"user_mobile\":\"%s\"}",
+            obj.get("user_id"),
+            obj.get("user_name"),
+            obj.get("user_password"),
+            obj.get("user_register_time"),
+            obj.get("user_role"),
+            obj.get("user_email"),
+            obj.get("user_mobile")
+        );
+    }
+
     private void overwriteUsersFile(List<JSONObject> users){
         try (PrintWriter writer = new PrintWriter(new FileWriter(USER_FILE, false))){
             for (JSONObject obj : users){
-                writer.println(obj.toJSONString());
+                writer.println(getOrderedJSONString(obj));
             }
         } catch (IOException e){
             System.err.println("Error overwriting user file: " + e.getMessage());

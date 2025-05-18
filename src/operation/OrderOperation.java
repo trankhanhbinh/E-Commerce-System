@@ -1,4 +1,4 @@
-package operation;
+package Assignment.src.operation;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -28,8 +28,8 @@ import javafx.scene.image.WritableImage;
 import javax.imageio.ImageIO;
 
 
-import model.Order;
-import model.Product;
+import Assignment.src.model.Order;
+import Assignment.src.model.Product;
 
 public class OrderOperation{
     private static OrderOperation instance;
@@ -108,7 +108,6 @@ public class OrderOperation{
     var productResult = ProductOperation.getInstance().getProductList(1);
     List<Product> availableProducts = productResult.getProductList();
     if (availableProducts == null || availableProducts.isEmpty()) {
-        // add a dummy product.
         availableProducts = new ArrayList<>();
         availableProducts.add(new Product("p_dummy", "dummyModel", "dummyCategory", "Dummy Product", 0.0, 0.0, 0.0, 0));
     }
