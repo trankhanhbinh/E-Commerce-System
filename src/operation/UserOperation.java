@@ -1,4 +1,4 @@
-package Assignment.src.operation;
+package operation;
 
 import java.io.*;
 import java.util.*;
@@ -6,9 +6,9 @@ import java.util.regex.Pattern;
 import org.json.simple.*;
 import org.json.simple.parser.*;
 
-import Assignment.src.model.User;
-import Assignment.src.model.Admin;
-import Assignment.src.model.Customer;
+import model.User;
+import model.Admin;
+import model.Customer;
 
 public class UserOperation {
     private static UserOperation instance;
