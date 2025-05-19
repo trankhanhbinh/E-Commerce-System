@@ -75,10 +75,23 @@ public class AdminOperation{
         return list;
     }
 
-    private void writeUserToFile(JSONObject userObj){
-        try (PrintWriter writer = new PrintWriter(new FileWriter(USER_FILE, true))){
-            writer.println(userObj.toJSONString());
-        } catch (IOException e){
+    private void writeUserToFile(JSONObject userObj) {
+        String orderedJSONString = String.format(
+            "{\"user_id\":\"%s\",\"user_name\":\"%s\",\"user_password\":\"%s\"," +
+            "\"user_register_time\":\"%s\",\"user_role\":\"%s\",\"user_email\":\"%s\",\"user_mobile\":\"%s\"}",
+            userObj.get("user_id"),
+            userObj.get("user_name"),
+            userObj.get("user_password"),
+            userObj.get("user_register_time"),
+            userObj.get("user_role"),
+            userObj.get("user_email"),
+            userObj.get("user_mobile")
+        );
+
+        try (PrintWriter writer = new PrintWriter(new FileWriter(USER_FILE, true))) {
+            writer.print("\n");
+            writer.print(orderedJSONString);
+        } catch (IOException e) {
             System.err.println("Error writing user to file: " + e.getMessage());
         }
     }

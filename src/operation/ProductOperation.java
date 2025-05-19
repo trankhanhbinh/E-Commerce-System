@@ -1,4 +1,8 @@
 package operation;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 65def0233ff387179ad08d70c13dd41e2befad27
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -15,7 +19,6 @@ import org.json.simple.parser.ParseException;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Scene;
-import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
@@ -23,7 +26,6 @@ import javafx.scene.chart.PieChart;
 import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.image.WritableImage;
-import javafx.stage.Stage;
 import javax.imageio.ImageIO;
 
 
@@ -33,10 +35,6 @@ public class ProductOperation{
     private static ProductOperation instance;
     private static final String PRODUCT_FILE = "data/products.txt";
     private static final int PAGE_SIZE = 10;
-    
-    static{
-        Platform.startup(() -> {});
-    }
     
     private ProductOperation(){
     }
