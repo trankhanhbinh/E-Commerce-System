@@ -1,9 +1,4 @@
-<<<<<<< HEAD
 package operation;
-=======
-package operation
->>>>>>> a603b06a5bc8aece485f638b6d5bf9ee01ca0042
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;

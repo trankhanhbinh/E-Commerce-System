@@ -1,0 +1,10 @@
+{
+    "java.project.sourcePaths": [
+        ".",
+        "src"
+    ],
+    "java.project.referencedLibraries": [
+        "src\\operation\\javafx.jar",
+        "d:\\BO\\OOP\\E-Commerce-System\\src\\operation\\json-simple-1.1.1.jar"
+    ]
+}
