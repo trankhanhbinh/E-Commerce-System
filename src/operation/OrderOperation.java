@@ -98,14 +98,19 @@ public class OrderOperation{
     }
     
     public void generateTestOrderData() {
-    String[] customerIds = {
-        "u_0000000002", "u_0000000003", "u_0000000004",
-        "u_0000000005", "u_0000000006", "u_0000000007",
-        "u_0000000008", "u_0000000009", "u_0000000010",
-        "u_0000000011"
-    };
+    List<Customer> customerList = CustomerOperation.getInstance().getAllCustomers();
     
-    var productResult = ProductOperation.getInstance().getProductList(1);
+    if (customerList.isEmpty()) {
+        System.err.println("No customers available to generate test orders.");
+        return;
+    }
+    
+    List<String> customerIds = new ArrayList<>();
+    for (Customer customer : customerList) {
+        customerIds.add(customer.getUserId());
+    }
+
+    ProductOperation.ProductListResult productResult = ProductOperation.getInstance().getProductList(1);
     List<Product> availableProducts = productResult.getProductList();
     if (availableProducts == null || availableProducts.isEmpty()) {
         availableProducts = new ArrayList<>();
