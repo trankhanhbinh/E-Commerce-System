@@ -147,7 +147,7 @@ public class CustomerOperation{
         overwriteUsersFile(users);
     }
     
-    private List<Customer> getAllCustomers(){
+    public List<Customer> getAllCustomers(){
         List<Customer> customers = new ArrayList<>();
         List<JSONObject> users = readUsersFromFile();
         for (JSONObject obj : users) {

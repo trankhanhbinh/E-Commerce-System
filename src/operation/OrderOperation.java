@@ -27,12 +27,7 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.image.WritableImage;
 import javax.imageio.ImageIO;
 
-
-import model.Order;
-<<<<<<< HEAD
-=======
-import model.Product;
->>>>>>> 65def0233ff387179ad08d70c13dd41e2befad27
+import model.*;
 
 public class OrderOperation{
     private static OrderOperation instance;
