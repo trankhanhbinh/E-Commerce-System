@@ -150,7 +150,6 @@ public class CustomerOperation{
     private List<Customer> getAllCustomers(){
         List<Customer> customers = new ArrayList<>();
         List<JSONObject> users = readUsersFromFile();
-        System.out.println("DEBUG: Total user objects read: " + users.size());
         for (JSONObject obj : users) {
             String role = (String) obj.get("user_role");
             if (role != null && role.trim().equalsIgnoreCase("customer")){
@@ -166,7 +165,6 @@ public class CustomerOperation{
                 customers.add(customer);
             }
         }
-        System.out.println("DEBUG: Total loaded customers: " + customers.size());
         return customers;
     }
     
